@@ -23,18 +23,27 @@ jobs:
         python -m pip install --upgrade pip
         pip install coverage pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        
-    - name: Run tests with coverage
-      run: |
-        coverage run -m pytest
-        coverage report -m --fail-under=70
-        coverage html
-        
-    - name: Upload coverage report
-      uses: actions/upload-artifact@v4 # Оновлено до v4
-      with:
-        name: coverage-report
-        path: htmlcov/
+
+    - name: Lint with flake8
+          run: flake8 . --count --max-complexity=10 --statistics
+            
+        - name: Lint with pylint
+          run: pylint *.py --fail-under=7.0 || true
+            
+        - name: Type check with mypy
+          run: mypy *.py --ignore-missing-imports || true
+            
+        - name: Run tests with coverage
+          run: |
+            coverage run -m pytest
+            coverage report -m --fail-under=70
+            coverage html
+            
+        - name: Upload coverage report
+          uses: actions/upload-artifact@v4
+          with:
+            name: coverage-report
+            path: htmlcov/
 
   deploy:
     needs: test
