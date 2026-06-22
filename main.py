@@ -3,14 +3,12 @@ from pydantic import BaseModel
 
 app = FastAPI(title="Library API")
 
-# Модель данных для книги
 class Book(BaseModel):
     id: int
     title: str
     author: str
     is_borrowed: bool = False
 
-# Имитация базы данных в памяти
 fake_db = []
 
 @app.get("/")
