@@ -1,0 +1,40 @@
+name: Create Release Tag
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Важливо: дає дозвіл боту створювати теги
+      
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        
+    - name: Get version from file
+      id: version
+      run: |
+        VERSION=$(cat VERSION 2>/dev/null || echo "0.1.0")
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        
+    - name: Create tag
+      uses: actions/github-script@v6
+      env:
+        VERSION: ${{ steps.version.outputs.version }}
+      with:
+        script: |
+          const version = process.env.VERSION;
+          try {
+            await github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/tags/v${version}`,
+              sha: context.sha
+            });
+          } catch (error) {
+            console.log("Tag might already exist or error occurred:", error);
+          }
