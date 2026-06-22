@@ -12,7 +12,7 @@ def test_add_book():
         "/books",
         json={"id": 1, "title": "1984", "author": "George Orwell", "is_borrowed": False}
     )
-    assert response.status_code == 200
+    assert response.status_code == 201
     assert response.json()["title"] == "1984"
     assert len(fake_db) == 1
 
